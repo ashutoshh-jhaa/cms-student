@@ -1,5 +1,5 @@
 import bcrypt from "bcrypt";
-import facultyModel from "../model/faclty.model.js";
+import facultyModel from "../model/faculty.model.js";
 import studentModel from "../model/student.model.js";
 
 // Get faculty details by ID

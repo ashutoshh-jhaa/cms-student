@@ -13,6 +13,11 @@ const facultySchema = new mongoose.Schema(
     password: { type: String, required: true },
     phone: { type: String, required: true },
     dob: { type: Date, required: true },
+    image: {
+      publicId: { type: String, required: true },
+      originalName: { type: String, required: true },
+      url: { type: String, required: true },
+    },
     city: { type: String, required: true },
     state: { type: String, required: true },
     department: { type: String, required: true },

@@ -21,6 +21,7 @@ const router = express.Router();
 router.get("/faculty", getAllFaculties);
 
 //add faculty
+//'photo' is the name of the img tag
 router.post("/faculty", upload.single("photo"), addFaculty);
 
 //get faculty by id
@@ -36,13 +37,13 @@ router.delete("/faculty/:id", deleteFaculty);
 router.get("/student", getAllStudents);
 
 //add a student
-router.post("/student", addStudent);
+router.post("/student", upload.single("photo"), addStudent);
 
 //get student by id
 router.get("/student/:id", getStudent);
 
 //update student by id
-router.put("/student/:id", updateStudent);
+router.put("/student/:id", upload.single("photo"), updateStudent);
 
 //delete student by id
 router.delete("/student/:id", deleteStudent);

@@ -1,7 +1,11 @@
 import bcrypt from "bcrypt";
 import studentModel from "../model/student.model.js";
-import facultyModel from "../model/faclty.model.js";
+import facultyModel from "../model/faculty.model.js";
 import adminModel from "../model/admin.model.js";
+import fs from "node:fs/promises";
+import { cloudinaryFileUpload } from "../services/cloudinary/fileUpload.js";
+import facultySchema from "../services/validation/facultyValidation.js";
+import studentSchema from "../services/validation/studentValidation.js";
 
 // Get admin details
 export const getAdminDetails = async (req, res) => {
@@ -81,19 +85,42 @@ export const getAllFaculties = async (req, res) => {
 
 // Add a faculty
 export const addFaculty = async (req, res) => {
-  const { password } = req.body;
-  if (req.file) {
-    console.log("file was received");
-  }
-
   try {
-    const hashedPassword = await bcrypt.hash(password, 10);
-    req.body.password = hashedPassword;
+    if (!req.file) {
+      return res
+        .status(400)
+        .json({ status: false, message: "Profile pic is required" });
+    }
 
-    const faculty = await facultyModel.create(req.body);
+    const { error, value } = facultySchema.validate(req.body);
+    if (error) {
+      return res.status(404).json({
+        status: false,
+        message: "Validation Failed",
+        details: error.details.map((d) => d.message),
+      });
+    }
+
+    //hash password
+    value.password = await bcrypt.hash(value.password, 10);
+
+    //upload image to cloudinary
+    const imagePath = req.file.path;
+    const imageOriginalName = req.file.originalname;
+    const uploadResult = await cloudinaryFileUpload(imagePath, "faculty");
+
+    value.image = {
+      originalName: imageOriginalName,
+      url: uploadResult.url,
+      publicId: uploadResult.public_id,
+    };
+
+    const faculty = await facultyModel.create(value);
+    await fs.unlink(imagePath);
+
     res.status(201).json({
       status: true,
-      message: "Faculty created",
+      message: "Faculty added successfully",
       data: faculty,
     });
   } catch (error) {
@@ -244,11 +271,40 @@ export const getAllStudents = async (req, res) => {
 // Add student
 export const addStudent = async (req, res) => {
   try {
-    const { password } = req.body;
-    const hashedPassword = await bcrypt.hash(password, 10);
-    req.body.password = hashedPassword;
+    if (!req.file) {
+      return res
+        .status(400)
+        .json({ status: false, message: "Profile pic is required" });
+    }
 
-    const student = await studentModel.create(req.body);
+    const { error, value } = studentSchema.validate(req.body);
+
+    if (error) {
+      return res.status(400).json({
+        status: false,
+        message: "Validation failed",
+        details: error.details.map((d) => d.message),
+      });
+    }
+
+    //hash password
+    const hashedPassword = await bcrypt.hash(value.password, 10);
+    value.password = hashedPassword;
+
+    //upload to cloudinary
+    const imagePath = req.file.path;
+    const imageOriginalName = req.file.originalname;
+    const uploadResult = await cloudinaryFileUpload(imagePath, "student");
+
+    value.image = {
+      originalName: imageOriginalName,
+      url: uploadResult.url,
+      publicId: uploadResult.public_id,
+    };
+
+    const student = await studentModel.create(value);
+    await fs.unlink(imagePath);
+
     res.status(201).json({
       status: true,
       message: "Student was added successfully",
