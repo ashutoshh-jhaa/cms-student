@@ -23,6 +23,7 @@ const facultySchema = new mongoose.Schema(
     department: { type: String, required: true },
     designation: { type: String, required: true },
     courses: { type: [String], required: true },
+    role: { type: String, required: true, default: "faculty" },
   },
   { timestamps: true },
 );

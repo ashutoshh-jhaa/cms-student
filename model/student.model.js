@@ -15,6 +15,7 @@ const studentSchema = new mongoose.Schema(
     dob: { type: Date, required: true },
     city: { type: String, required: true },
     state: { type: String, required: true },
+    role: { type: String, required: true, default: "student" },
   },
   { timestamps: true },
 );

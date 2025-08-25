@@ -6,6 +6,7 @@ import {
   getStudent,
   updateStudent,
 } from "../controller/faculty.controller.js";
+import upload from "../config/multer.js";
 
 const router = express.Router();
 
@@ -16,12 +17,12 @@ router.get("/student", getAllStudents);
 router.get("/student/:id", getStudent);
 
 // Update a student by id under this faculty
-router.put("/student/:id", updateStudent);
+router.put("/student/:id", upload.single("photo"), updateStudent);
 
 // Get faculty details by id
 router.get("/:id", getFaculty);
 
 // Update faculty details by id
-router.put("/:id", updateFaculty);
+router.put("/:id", upload.single("photo"), updateFaculty);
 
 export default router;
