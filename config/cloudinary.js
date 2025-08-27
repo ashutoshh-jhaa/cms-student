@@ -1,5 +1,5 @@
 import { config } from "dotenv";
-config();
+config({ quiet: true });
 
 import { v2 as cloudinary } from "cloudinary";
 
