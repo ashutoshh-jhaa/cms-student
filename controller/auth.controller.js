@@ -6,6 +6,7 @@ import Admin from "../model/admin.model.js";
 import Student from "../model/student.model.js";
 
 const JWT_SECRET_KEY = process.env.JWT_SECRET_KEY;
+const JWT_EXPIRES_IN = "10m";
 
 //implement this last
 export const adminLogin = async (req, res) => {
@@ -33,7 +34,9 @@ export const adminLogin = async (req, res) => {
         .json({ status: false, message: "invalid credentials" });
     }
 
-    const token = jwt.sign({ id: admin.id, role: admin.role }, JWT_SECRET_KEY);
+    const token = jwt.sign({ id: admin.id, role: admin.role }, JWT_SECRET_KEY, {
+      expiresIn: JWT_EXPIRES_IN,
+    });
 
     res.status(200).json({
       status: true,
@@ -54,9 +57,10 @@ export const facultyLogin = async (req, res) => {
 
     const { error, value } = loginSchema.validate({ email, password });
     if (error) {
-      return res
-        .status(400)
-        .json({ status: false, message: "field validation failed" });
+      return res.status(400).json({
+        status: false,
+        message: error.message,
+      });
     }
 
     const faculty = await Faculty.findOne({ email });
@@ -76,6 +80,7 @@ export const facultyLogin = async (req, res) => {
     const token = jwt.sign(
       { id: faculty.id, role: faculty.role },
       JWT_SECRET_KEY,
+      { expiresIn: JWT_EXPIRES_IN },
     );
 
     res.status(200).json({
@@ -97,9 +102,7 @@ export const studentLogin = async (req, res) => {
 
     const { error, value } = loginSchema.validate({ email, password });
     if (error) {
-      return res
-        .status(400)
-        .json({ status: false, message: "field validation failed" });
+      return res.status(400).json({ status: false, message: error.message });
     }
 
     const student = await Student.findOne({ email });
@@ -119,6 +122,7 @@ export const studentLogin = async (req, res) => {
     const token = jwt.sign(
       { id: student.id, role: student.role },
       JWT_SECRET_KEY,
+      { expiresIn: JWT_EXPIRES_IN },
     );
 
     res.status(200).json({

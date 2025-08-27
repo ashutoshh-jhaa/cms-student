@@ -17,19 +17,46 @@ export const authenticateJwt = passport.authenticate("jwt", {
 
 export const authorize = (roles = []) => {
   return (req, res, next) => {
-    console.log(req.body.user);
-    const { role } = req.body.user;
+    const { role } = req.user;
 
     if (!roles.includes(role)) {
       return res.status(403).json({
-        message: "shit",
+        message: "Forbidden",
       });
     }
-
     next();
   };
 };
 
-// export const accessOwnDataOnly = (resourceType) => {
-//   return (req, res, next) => {};
-// };
+export const ownDataOnly = (resourceType) => {
+  return (req, res, next) => {
+    const { id: userId, role } = req.user;
+    const requestId = req.params.id;
+
+    if (
+      role === "student" &&
+      resourceType == "student" &&
+      userId != requestId
+    ) {
+      return res.status(403).json({
+        status: false,
+        message: "Forbidden: Access denied",
+      });
+    }
+
+    if (role == "faculty" && resourceType == "faculty" && userId != requestId) {
+      return res.status(403).json({
+        status: false,
+        message: "Forbidden: Access denied",
+      });
+    }
+
+    if (role == "admin" && resourceType == "admin" && userId != requestId) {
+      return res.status(403).json({
+        status: false,
+        message: "Forbidden: Access denied",
+      });
+    }
+    next();
+  };
+};
