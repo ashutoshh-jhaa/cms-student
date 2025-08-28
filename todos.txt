@@ -1,2 +1,0 @@
-completed all admin routes
-now implementing all faculty routes
