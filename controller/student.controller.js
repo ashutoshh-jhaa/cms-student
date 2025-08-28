@@ -1,10 +1,12 @@
 import bcrypt from "bcrypt";
 import studentModel from "../model/student.model.js";
-import { ObjectId } from "mongoose";
+import mongoose from "mongoose";
 import fs from "node:fs/promises";
 import { cloudinaryFileUpload } from "../services/cloudinary/fileUpload.js";
 import { cloudinaryFileDelete } from "../services/cloudinary/fileDelete.js";
 import studentSchema from "../services/validation/studentValidation.js";
+
+const { ObjectId } = mongoose.Types;
 
 // Get student details by ID
 export const getStudentDetails = async (req, res) => {

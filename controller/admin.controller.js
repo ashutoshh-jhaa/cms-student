@@ -3,11 +3,14 @@ import studentModel from "../model/student.model.js";
 import facultyModel from "../model/faculty.model.js";
 import adminModel from "../model/admin.model.js";
 import fs from "node:fs/promises";
-import { ObjectId } from "mongoose";
+import mongoose from "mongoose";
 import { cloudinaryFileUpload } from "../services/cloudinary/fileUpload.js";
 import facultySchema from "../services/validation/facultyValidation.js";
 import studentSchema from "../services/validation/studentValidation.js";
 import { cloudinaryFileDelete } from "../services/cloudinary/fileDelete.js";
+import adminSchema from "../services/validation/adminValidation.js";
+
+const { ObjectId } = mongoose.Types;
 
 // Get admin details by ID
 export const getAdminDetails = async (req, res) => {
@@ -49,14 +52,33 @@ export const updateAdminDetails = async (req, res) => {
   try {
     // Extract ID from request parameters
     const { id } = req.params;
+
     // Validate MongoDB ObjectId
     if (!ObjectId.isValid(id)) {
       return res
         .status(400)
         .json({ status: false, message: "Invalid ID format" });
     }
+
+    //validate fields
+    const updatedAdminSchema = adminSchema
+      .fork(
+        ["firstName", "lastName", "gender", "dob", "city", "state"],
+        (schema) => schema.optional(),
+      )
+      .fork(["email", "password"], (schema) => schema.forbidden());
+
+    const { error, value } = updatedAdminSchema.validate(req.body);
+    if (error) {
+      return res.status(400).json({
+        status: false,
+        message: "Admin validation failed",
+        details: error.details.map((d) => d.message),
+      });
+    }
+
     // Update admin in database and return updated document
-    const updatedAdmin = await adminModel.findByIdAndUpdate(id, req.body, {
+    const updatedAdmin = await adminModel.findByIdAndUpdate(id, value, {
       new: true,
     });
     if (!updatedAdmin) {
@@ -65,6 +87,7 @@ export const updateAdminDetails = async (req, res) => {
         message: "Admin does not exist",
       });
     }
+
     // Return updated admin details
     res.status(200).json({
       status: true,

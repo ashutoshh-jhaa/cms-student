@@ -31,6 +31,7 @@ export const authorize = (roles = []) => {
 export const ownDataOnly = (resourceType) => {
   return (req, res, next) => {
     const { id: userId, role } = req.user;
+
     const requestId = req.params.id;
 
     if (

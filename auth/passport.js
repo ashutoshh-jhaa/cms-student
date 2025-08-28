@@ -17,9 +17,9 @@ passport.use(
     if (role == "admin") {
       user = await Admin.findById(id);
     } else if (role == "faculty") {
-      user = Faculty.findById(id);
+      user = await Faculty.findById(id);
     } else if (role == "student") {
-      user = Student.findById(id);
+      user = await Student.findById(id);
     }
 
     if (user) {

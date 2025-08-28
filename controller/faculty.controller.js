@@ -1,17 +1,20 @@
 import bcrypt from "bcrypt";
 import facultyModel from "../model/faculty.model.js";
 import studentModel from "../model/student.model.js";
-import { ObjectId } from "mongoose";
+import mongoose from "mongoose";
 import fs from "node:fs/promises";
 import { cloudinaryFileUpload } from "../services/cloudinary/fileUpload.js";
 import { cloudinaryFileDelete } from "../services/cloudinary/fileDelete.js";
 import facultySchema from "../services/validation/facultyValidation.js";
 import studentSchema from "../services/validation/studentValidation.js";
 
+const { ObjectId } = mongoose.Types;
+
 // Get faculty details by ID
 export const getFaculty = async (req, res) => {
   // Extract ID from request parameters
   const { id } = req.params;
+  console.log(id);
   try {
     // Validate MongoDB ObjectId
     if (!ObjectId.isValid(id)) {

@@ -7,6 +7,7 @@ import {
   updateStudent,
 } from "../controller/faculty.controller.js";
 import upload from "../config/multer.js";
+import { ownDataOnly } from "../auth/auth-middleware.js";
 
 const router = express.Router();
 
@@ -20,9 +21,14 @@ router.get("/student/:id", getStudent);
 router.put("/student/:id", upload.single("photo"), updateStudent);
 
 // Get faculty details by id
-router.get("/:id", getFaculty);
+router.get("/:id", ownDataOnly("faculty"), getFaculty);
 
 // Update faculty details by id
-router.put("/:id", upload.single("photo"), updateFaculty);
+router.put(
+  "/:id",
+  ownDataOnly("faculty"),
+  upload.single("photo"),
+  updateFaculty,
+);
 
 export default router;
